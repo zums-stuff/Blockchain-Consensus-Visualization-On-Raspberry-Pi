@@ -1,0 +1,30 @@
+{
+    "network_type": "circle",
+    "connections_dict": {
+        "mypi1": [
+            "mypi2"
+        ],
+        "mypi2": [
+            "mypi3"
+        ],
+        "mypi3": [
+            "mypi4"
+        ],
+        "mypi4": [
+            "mypi10"
+        ],
+        "mypi10": [
+            "mypi11"
+        ],
+        "mypi11": [
+            "mypi1"
+        ]
+    },
+    "hostnames": [
+        "mypi7",
+        "mypi8"
+    ],
+    "universal_password": "mypi1",
+    "universal_username": "raspberry-node",
+    "number_of_blocks_per_run": 500
+}
