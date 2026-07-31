@@ -17,8 +17,9 @@ def execute_commands_on_pi(ssh_client, commands):
 
 def get_ip_addresses(network_structure_file, username, password):
     script_dir = os.path.dirname(__file__)
-    network_structure_file = os.path.join(script_dir, 'network_struc.json')
-    ip_adress_file=os.path.join(script_dir, 'ip_address.json')
+    base_project_dir = os.path.dirname(script_dir)
+    network_structure_file = os.path.join(base_project_dir, 'configs', 'network_struc.json')
+    ip_adress_file = os.path.join(base_project_dir, 'configs', 'ip_address.json')
     try:
         # Read network structure from the JSON file
         with open(network_structure_file, 'r') as f:

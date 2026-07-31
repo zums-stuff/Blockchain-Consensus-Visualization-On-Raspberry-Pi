@@ -44,8 +44,10 @@ def execute_commands_on_pi(ssh_client, commands):
 def get_ip_dict(hostnames_list, username, password):
     ip_dict = {}
     try:
-        with open(os.path.join(os.path.dirname(__file__), 'ip_address.json'), 'r') as f:
+        config_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'configs')
+        with open(os.path.join(config_dir, 'ip_address.json'), 'r') as f:
             saved_ips = json.load(f)
+
         for hostname in hostnames_list:
             ip_dict[hostname] = saved_ips.get(hostname, 'N/A')
     except Exception as e:
@@ -147,8 +149,9 @@ def copy_file_to_raspberry_pis(hostnames, password, local_file_path, remote_file
 if __name__ == '__main__':
     script_dir = os.path.dirname(__file__)
     # Task 1: Read network_struc.json to get Network Structure and username, pi password, list of pis in network
-    network_structure_file = os.path.join(script_dir, 'network_struc.json')
-    ip_address_file = os.path.join(script_dir, 'ip_address.json')
+    base_project_dir = os.path.dirname(script_dir)
+    network_structure_file = os.path.join(base_project_dir, 'configs', 'network_struc.json')
+    ip_address_file = os.path.join(base_project_dir, 'configs', 'ip_address.json')
 
     hostnames_list, _, universal_password, universal_username = read_network_structure(network_structure_file)
     #print("Results: ", hostnames_list, universal_password, universal_username)
@@ -169,7 +172,7 @@ if __name__ == '__main__':
 
 
     # Task 5: Update index_new.html
-    index_html_file = os.path.join(script_dir, 'index_new.html')
+    index_html_file = os.path.join(script_dir, 'webui', 'index_new.html')
 
     update_ip_addresses_in_html(index_html_file,ip_dict)
     #update_ip_addresses_in_html(index_html_file,ip_dict)

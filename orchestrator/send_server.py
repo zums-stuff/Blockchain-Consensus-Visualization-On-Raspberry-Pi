@@ -20,8 +20,10 @@ def copy_file_to_raspberry_pis(hostnames, password, local_file_path, remote_file
     # Cargar archivo de IPs
     ip_dict = {}
     try:
-        with open(os.path.join(os.path.dirname(__file__), 'ip_address.json'), 'r') as f:
+        config_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'configs')
+        with open(os.path.join(config_dir, 'ip_address.json'), 'r') as f:
             ip_dict = json.load(f)
+
     except Exception as e:
         print(f"Advertencia: No se pudo leer ip_address.json ({e})")
 
@@ -52,46 +54,39 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(__file__)
     
     # 1. Leer configuración de la red
-    network_structure_file = os.path.join(script_dir, 'network_struc.json')
-    
+    base_project_dir = os.path.dirname(script_dir)
+    network_structure_file = os.path.join(base_project_dir, 'configs', 'network_struc.json')
+
     if not os.path.exists(network_structure_file):
         print(f"Error: No se encontró el archivo {network_structure_file}")
         exit(1)
 
     hostnames_list, _, universal_password, universal_username = read_network_structure(network_structure_file)
-
     print(f"--- Iniciando despliegue a: {hostnames_list} ---")
 
-    # 2. LISTA DE ARCHIVOS A ENVIAR
+    # Mapeo exacto: (Ruta local en tu laptop, Nombre con el que se guarda en la Raspberry Pi)
     files_to_send = [
-        "server.py",
-        "start_visualization.py",
-        "plot_emissions.py",
-        "tx_generator.py",
-        "analyze_metrics.py"
+        (os.path.join(base_project_dir, "node", "server.py"), "server.py"),
+        (os.path.join(base_project_dir, "node", "start_visualization.py"), "start_visualization.py"),
+        (os.path.join(base_project_dir, "node", "tx_generator.py"), "tx_generator.py"),
+        (os.path.join(base_project_dir, "node", "utils", "plot_emissions.py"), "plot_emissions.py"),
+        (os.path.join(base_project_dir, "node", "utils", "analyze_metrics.py"), "analyze_metrics.py"),
+        (os.path.join(base_project_dir, "node", "utils", "block_json.py"), "block_json.py"),
+        (os.path.join(base_project_dir, "node", "utils", "mining_json.py"), "mining_json.py"),
+        (os.path.join(base_project_dir, "node", "utils", "all_chain.py"), "all_chain.py"),
+        (os.path.join(base_project_dir, "configs", "testchain_final.json"), "testchain_final.json")
     ]
 
-    # 3. Bucle para enviar cada archivo
-    for filename in files_to_send:
-        local_path = os.path.join(script_dir, filename)
-        
-        # Verificamos que el archivo exista en TU pc antes de intentar enviarlo
+    for local_path, remote_filename in files_to_send:
         if os.path.exists(local_path):
-            print(f"\nProcesando: {filename}...")
-            
-            remote_filename = filename
-
-            if filename == "repuesto_de_server.py":
-                remote_filename = "server.py"
-                print(f"   -> Se renombrará a '{remote_filename}' en el destino.")
-
+            print(f"\nProcesando: {remote_filename}...")
             copy_file_to_raspberry_pis(
-                hostnames=hostnames_list, 
-                password=universal_password, 
-                local_file_path=local_path, 
+                hostnames=hostnames_list,
+                password=universal_password,
+                local_file_path=local_path,
                 remote_file_path=remote_filename
             )
         else:
-            print(f"ADVERTENCIA: No se encontró '{filename}' en la carpeta actual. Se omitirá.")
+            print(f"ADVERTENCIA: No se encontró '{local_path}'. Se omitirá.")
 
     print("\n--- ¡Despliegue finalizado! ---")

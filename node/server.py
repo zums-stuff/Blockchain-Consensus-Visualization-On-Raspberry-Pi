@@ -49,7 +49,7 @@ base_ip_path="/home/raspberry-node/ip_adress.txt"
 base_ip_filename="ip_adress.txt"
 base_chainid=5000
 base_ipc_path = "/home/raspberry-node/.testchain44/geth.ipc"
-base_genesis_block_configuration_file_path = "/home/raspberry-node/Documents/testchain_final.json"
+base_genesis_block_configuration_file_path = "/home/raspberry-node/testchain_final.json"
 base_pi_home_path="/home/raspberry-node/"
 
 base_pi_password="mypi1"
@@ -751,14 +751,13 @@ def organize_files(chain_id):
 
 
     file_paths = [
-    '/home/raspberry-node/MAP/{hostname}}/{chain_id}/all_block_data.json',
-    '/home/raspberry-node/MAP/{hostname}}/{chain_id}/block_data.log',
-    '/home/raspberry-node/MAP/{hostname}}/{chain_id}/chain_output.json',
-    '/home/raspberry-node/MAP/{hostname}}/{chain_id}/mining_output.log',
-    '/home/raspberry-node/MAP/{hostname}}/{chain_id}//output_mining.json',
-    '/home/raspberry-node/MAP/{hostname}}/{chain_id}//configuration_run.txt',
-    # Add other file paths as needed
-]
+        f'/home/raspberry-node/MAP/{pi_hostname}/{chain_id}/all_block_data.json',
+        f'/home/raspberry-node/MAP/{pi_hostname}/{chain_id}/block_data.log',
+        f'/home/raspberry-node/MAP/{pi_hostname}/{chain_id}/chain_output.json',
+        f'/home/raspberry-node/MAP/{pi_hostname}/{chain_id}/mining_output.log',
+        f'/home/raspberry-node/MAP/{pi_hostname}/{chain_id}/output_mining.json',
+        f'/home/raspberry-node/MAP/{pi_hostname}/{chain_id}/configuration_run.txt'
+    ]
 
     files_to_copy = ["checksums.json","block_data.log", "mining_output.log", "output.json","chain_output.json", "output_mining.json","all_block_data.json","configuration_run.txt"]
 
