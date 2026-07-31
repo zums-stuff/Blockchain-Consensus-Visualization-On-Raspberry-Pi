@@ -1,23 +1,11 @@
 {
     "network_type": "circle",
     "connections_dict": {
-        "mypi1": [
-            "mypi2"
+        "mypi7": [
+            "mypi8"
         ],
-        "mypi2": [
-            "mypi3"
-        ],
-        "mypi3": [
-            "mypi4"
-        ],
-        "mypi4": [
-            "mypi10"
-        ],
-        "mypi10": [
-            "mypi11"
-        ],
-        "mypi11": [
-            "mypi1"
+        "mypi8": [
+            "mypi7"
         ]
     },
     "hostnames": [

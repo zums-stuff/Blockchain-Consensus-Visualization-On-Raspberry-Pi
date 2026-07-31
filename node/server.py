@@ -69,7 +69,7 @@ w3 = Web3(Web3.IPCProvider(base_ipc_path))
 
 def get_ip_from_hostname(hostname):
     script_dir = os.path.dirname(__file__)
-    ip_address_file = os.path.join(script_dir, 'ip_address.json')
+    ip_address_file = os.path.join(script_dir, 'configs/ip_address.json')
 
     with open(ip_address_file, 'r') as f:
         ip_addresses_dict = json.load(f)
@@ -542,7 +542,7 @@ def get_and_save_enode_url_to_file(enode_url_file_name):
 #4) Start Node Function
 def start_node():
     try:
-        datadir = f"/home/raspberry-node/.{base_account_name}"
+        datadir = get_datadir(base_account_name)
         # FIX: Eliminado --miner.etherbase={eth_account} para que por defecto use la cuenta real del keystore y no queme los ETH.
         command = f"geth --datadir {datadir} --syncmode full --snapshot=false --port {base_port} --networkid {base_networkid} console --nodiscover 2>&1 | tee mining_output.log"
 
@@ -997,19 +997,19 @@ def stop_mining():
 def save_block_data():
     try:
         # Execute the commands to save block data
-        subprocess.run(['python', 'block_json.py'], check=True)
-        subprocess.run(['python', 'mining_json.py'], check=True)
-        subprocess.run(['python', 'all_chain.py'], check=True)
+        subprocess.run(['python', 'utils/block_json.py'], check=True)
+        subprocess.run(['python', 'utils/mining_json.py'], check=True)
+        subprocess.run(['python', 'utils/all_chain.py'], check=True)
         
         # Generar gráficas de energía de CodeCarbon
         try:
-            subprocess.run(['python', 'plot_emissions.py'])
+            subprocess.run(['python', 'utils/plot_emissions.py'])
         except Exception as plot_e:
             print(f"Grafica de energia fallo: {plot_e}")
 
         # Generar métricas de Pandas para los paquetes (transacciones)
         try:
-            subprocess.run(['python', 'analyze_metrics.py'])
+            subprocess.run(['python', 'utils/analyze_metrics.py'])
         except Exception as pk_e:
             print(f"Analisis de paquetes fallo: {pk_e}")
 
@@ -1082,7 +1082,7 @@ def send_sigint_to_geth():
 @app.route('/start_everything', methods=['POST'])
 def start_everything():
     try:
-        with open('/home/raspberry-node/number_of_testruns.txt', 'r') as f:
+        with open(base_pi_home_path + 'number_of_testruns.txt', 'r') as f:
             content = f.read().strip()
             number_of_testruns = int(content) if content else 1
     except Exception as e:

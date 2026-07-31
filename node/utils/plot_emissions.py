@@ -4,18 +4,6 @@ import plotly.graph_objects as go
 import os
 from plotly.subplots import make_subplots
 
-def generate_report():
-    if not os.path.exists('emissions.csv'):
-        print("No se encontró emissions.csv. No se puede generar el reporte.")
-        return
-
-    try:
-        # Leer datos
-        df = pd.read_csv('emissions.csv')
-        
-        # Limpiar datos
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
-        
 def build_figure(df, title):
     fig = make_subplots(
         rows=3, cols=1,

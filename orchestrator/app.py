@@ -1,6 +1,8 @@
 import json, paramiko,os, time,subprocess, threading,re, webbrowser
 from scp import SCPClient
 
+script_dir = os.path.dirname(__file__)
+
 
 def read_network_structure(network_structure_file):
     with open(network_structure_file, 'r') as f:
@@ -119,7 +121,8 @@ def update_ip_addresses_in_html(html_file, ip_dict):
 def copy_file_to_raspberry_pis(hostnames, password, local_file_path, remote_file_path):
     ip_dict = {}
     try:
-        with open(os.path.join(os.path.dirname(__file__), 'ip_address.json'), 'r') as f:
+        config_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'configs')
+        with open(os.path.join(config_dir, 'ip_address.json'), 'r') as f:
             ip_dict = json.load(f)
     except:
         pass
@@ -147,7 +150,6 @@ def copy_file_to_raspberry_pis(hostnames, password, local_file_path, remote_file
 
 
 if __name__ == '__main__':
-    script_dir = os.path.dirname(__file__)
     # Task 1: Read network_struc.json to get Network Structure and username, pi password, list of pis in network
     base_project_dir = os.path.dirname(script_dir)
     network_structure_file = os.path.join(base_project_dir, 'configs', 'network_struc.json')
@@ -203,7 +205,7 @@ if __name__ == '__main__':
     time.sleep(2)
     
     # Open browser
-    webbrowser.open(f'http://localhost:{PORT}/index_new.html')
+    webbrowser.open(f'http://localhost:{PORT}/webui/index_new.html')
     
     # Keep the script running
     print("Server is running. Press Ctrl+C to stop.")
