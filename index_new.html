@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Device Control Panel</title>
+</head>
+
+<body>
+    <h1>Device Control Panel</h1>
+
+    <h2>Network Topology Selection</h2>
+    <form id="topologyForm">
+        <label for="topologySelect">Select Network Topology: </label>
+        <select id="topologySelect" name="topology">
+            <option value="circle">Circle</option>
+            <option value="star">Star</option>
+            <option value="grid">Grid</option>
+        </select><br><br>
+
+        <button type="button" onclick="setTopology()">Set Topology</button>
+    </form>
+
+    <h2>Number of Test Runs </h2>
+    <form id="numberOfTestRunsForm">
+        <label for="numberOfTestRunsInput">Enter Number of Test Runs: </label>
+        <input type="number" id="numberOfTestRunsInput" name="numberOfTestRuns" required><br><br>
+
+        <button type="button" onclick="setNumberOfTestRuns()">Set Number of Test Runs</button>
+    </form>
+
+    <h2>Set Mining Difficulty </h2>
+    <form id="mininDifficultyForm">
+        <div id="miningDifficultyDevices">
+            <!-- JavaScript will populate this section -->
+        </div>
+        <input type="text" id="mining_difficulty_shared" name="mining_difficulty_shared"><br><br>
+
+        <button type="button" onclick="setMiningDifficultySelectedDevices()">Set Mining Difficulty for selected
+            Devices</button>
+    </form>
+
+    <h2>Delay Section</h2>
+    <form id="delayForm">
+        <div id="delayDevices">
+            <!-- JavaScript will populate this section -->
+        </div>
+        <button type="button" onclick="delaySelectedDevices()">Delay the Selected Devices</button>
+    </form>
+
+
+    <h2>Start Everything Section</h2>
+    <form id="startEverythingForm">
+        <div id="startEverythingDevices">
+            <!-- JavaScript will populate this section -->
+        </div>
+        <button type="button" onclick="startEverything()">Start Everything</button>
+    </form>
+
+
+    <script>
+        const ipAdresses = {
+    mypi1: '192.168.1.20',
+    mypi2: '192.168.1.22',
+    mypi3: '192.168.1.12',
+    mypi4: '192.168.1.45',
+};;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+        // Function to set topology
+        async function setTopology() {
+            const topologySelect = document.getElementById('topologySelect');
+            const selectedTopology = topologySelect.value;
+
+            const checkboxes = document.querySelectorAll('#startEverythingDevices input[type="checkbox"]:checked');
+            const setTopologyUrls = Array.from(checkboxes).map(checkbox => {
+                const ip = checkbox.value;
+                return `http://${ip}:5000/change_topology?topology=${selectedTopology}`;
+            });
+
+            if (setTopologyUrls.length > 0) {
+                try {
+                    await Promise.all(setTopologyUrls.map(url => fetch(url, { method: 'POST' })));
+                    alert(`Network topology set to ${selectedTopology} for selected devices.`);
+                } catch (error) {
+                    console.error("Error setting topology:", error);
+                    alert("Error setting topology. Check console for details.");
+                }
+            } else {
+                alert("Please select at least one device in the 'Start Everything' section.");
+            }
+        }
+
+        // Function to create a checkbox for a device in the Stop Server section
+        function CreateStandardSectionFields(name, ip) {
+            const deviceDiv = document.createElement('div');
+
+            // Checkbox
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = name;
+            checkbox.value = ip;
+            checkbox.checked = true; // Precheck based on the dictionary
+
+            // Label for the checkbox
+            const label = document.createElement('label');
+            label.innerText = name;
+
+            // Dropdown list
+            const dropdown = document.createElement('select');
+            dropdown.name = `${name}_dropdown`; // Adjusted name to include the checkbox name
+            // Adding options to the dropdown
+            for (let i = 1; i <= 4; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.text = i;
+                dropdown.appendChild(option);
+            }
+
+            // Set default value for the dropdown
+            dropdown.value = '1';
+
+            // Appending elements to the deviceDiv
+            deviceDiv.appendChild(checkbox);
+            deviceDiv.appendChild(label);
+            deviceDiv.appendChild(dropdown);
+
+            return deviceDiv;
+        }
+
+
+
+        // Function to create a checkbox and input field for a device in the Set Mining Difficulty Section
+        function CreateMiningDifficultySectionFields(name, ip) {
+            const deviceDiv = document.createElement('div');
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = `${name}_checkbox`;
+            checkbox.value = ip;
+            checkbox.checked = true; // Precheck based on the dictionary
+
+            const label = document.createElement('label');
+            label.innerText = name;
+
+            deviceDiv.appendChild(checkbox);
+            deviceDiv.appendChild(label);
+
+            return deviceDiv;
+        }
+
+
+
+
+
+
+        // Function to create a checkbox and input field for a device in the Delay section
+        function createDelaySectionFields(name, ip) {
+            const deviceDiv = document.createElement('div');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.name = name; // Use the name without appending "_speed"
+            checkbox.value = ip;
+            checkbox.checked = true; // Precheck based on the dictionary
+            const label = document.createElement('label');
+            label.innerText = name;
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.name = `${name}_speed`; // Correctly set the name for the speed input field
+
+            deviceDiv.appendChild(checkbox);
+            deviceDiv.appendChild(label);
+            deviceDiv.appendChild(input);
+
+            return deviceDiv;
+        }
+
+
+        // Function to populate start nodes, start Everything sections
+        function populateSections() {
+            const miningDifficultyDevices = document.getElementById('miningDifficultyDevices');
+            const delayDevices = document.getElementById('delayDevices');
+
+            const startEverythingDevices = document.getElementById('startEverythingDevices');
+
+
+            for (const key in ipAdresses) {
+                if (ipAdresses.hasOwnProperty(key)) {
+
+                    const miningDifficultyDeviceDiv = CreateMiningDifficultySectionFields(key, ipAdresses[key]);
+                    miningDifficultyDevices.appendChild(miningDifficultyDeviceDiv.cloneNode(true));
+
+                    const delayDeviceDiv = createDelaySectionFields(key, ipAdresses[key]);
+                    delayDevices.appendChild(delayDeviceDiv.cloneNode(true));
+
+                    const startEverythingDeviceDiv = CreateStandardSectionFields(key, ipAdresses[key]);
+                    startEverythingDevices.appendChild(startEverythingDeviceDiv.cloneNode(true));
+
+                }
+            }
+        }
+
+
+        // Function to set Mining Difficulty for selected devices
+        async function setMiningDifficultySelectedDevices() {
+            const checkboxes = document.querySelectorAll('#miningDifficultyDevices input[type="checkbox"]:checked');
+            const setMiningDifficultyUrls = Array.from(checkboxes).map(checkbox => {
+                const name = checkbox.name;
+                const ip = checkbox.value;
+                const difficultyInput = document.querySelector(`input[name="mining_difficulty_shared"]`);
+                const difficulty = difficultyInput.value || '30'; // Default difficulty
+                console.log("DIFFFF");
+                console.log(difficulty)
+
+                return `http://${ip}:5000/change_difficulty?difficulty=${difficulty}`;
+            });
+
+            if (setMiningDifficultyUrls.length > 0) {
+                try {
+                    await Promise.all(setMiningDifficultyUrls.map(url => fetch(url, { method: 'POST' })));
+                    alert("Set Mining Difficulty applied to selected devices.");
+                } catch (error) {
+                    console.error("Error applying Set Mining Difficulty:", error);
+                }
+            }
+        }
+
+
+        // Function to set number of test runs
+        async function setNumberOfTestRuns() {
+            const checkboxes = document.querySelectorAll('#startEverythingDevices input[type="checkbox"]:checked');
+            const set_numberOfTestRuns_urls = Array.from(checkboxes).map(checkbox => {
+                const name = checkbox.name;
+                const ip = checkbox.value;
+                const dropdown = document.querySelector(`[name="numberOfTestRuns"]`);
+                const selectedOption = dropdown.value;
+                const numberOfTestRuns = dropdown.value || '1'; // Default speed
+                console.log("NUMBER OF TEST RUNS", numberOfTestRuns)
+
+                return `http://${ip}:5000/number_of_testruns?number_of_testruns=${numberOfTestRuns}`;
+            });
+
+            if (set_numberOfTestRuns_urls.length > 0) {
+                try {
+                    await Promise.all(set_numberOfTestRuns_urls.map(url => fetch(url, { method: 'POST' })));
+                    alert("Set Number of Test Runs.");
+                } catch (error) {
+                    console.error("Error setting Number of Test Runs:", error);
+                }
+            }
+        }
+
+
+
+
+
+        // Function to delay selected devices
+        async function delaySelectedDevices() {
+            const checkboxes = document.querySelectorAll('#delayDevices input[type="checkbox"]:checked');
+            const delayUrls = Array.from(checkboxes).map(checkbox => {
+                const name = checkbox.name;
+                const ip = checkbox.value;
+                const delayInput = document.querySelector(`input[name="${name}_speed"]`);
+                console.log("DELAY: ", delayInput)
+                console.log("NAME: ", name)
+
+                const delay = delayInput.value; // Default speed
+                console.log("DELAY: ", delay)
+
+
+                return `http://${ip}:5000/delay?delay=${delay}`;
+            });
+
+            if (delayUrls.length > 0) {
+                try {
+                    await Promise.all(delayUrls.map(url => fetch(url, { method: 'POST' })));
+                    alert("Delaying applied to selected devices.");
+                } catch (error) {
+                    console.error("Error applying delay:", error);
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // Function to add peer and start mining
+        async function startEverything() {
+            setNumberOfTestRuns()
+            setMiningDifficultySelectedDevices()
+            delaySelectedDevices()
+            const checkboxes = document.querySelectorAll('#startEverythingDevices input[type="checkbox"]:checked');
+            const start_everything_urls = Array.from(checkboxes).map(checkbox => {
+                const name = checkbox.name;
+                const ip = checkbox.value;
+                const dropdown = document.querySelector(`select[name="${name}_dropdown"]`);
+                const selectedOption = dropdown.value;
+                const mining_option = dropdown.value || '1'; // Default speed
+                console.log("MINING OPTION", mining_option)
+
+                return `http://${ip}:5000/start_everything?mining_option=${mining_option}`;
+            });
+
+            if (start_everything_urls.length > 0) {
+                try {
+                    await Promise.all(start_everything_urls.map(url => fetch(url, { method: 'POST' })));
+                    alert("Starting Everything for selected nodes.");
+                } catch (error) {
+                    console.error("Error starting everything nodes:", error);
+                }
+            }
+        }
+
+        populateSections();
+    </script>
+</body>
+
+</html>

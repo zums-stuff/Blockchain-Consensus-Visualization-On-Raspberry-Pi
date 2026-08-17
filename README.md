@@ -6,7 +6,8 @@ This project is a distributed simulation and visualization tool for blockchain c
 - **Project Repository:** [Blockchain Consensus Visualization on Raspberry Pi](https://github.com/Franco0932/Blockchain-Consensus-Visualization-On-Raspberry-Pi-Proyecto.git)
 
 ---
-## Project Structure
+
+## 🛠️ Project Structure
 - `app.py`: The Main Orchestrator. Connects to all Raspberry Pis, retrieves their IP addresses, syncs the topology configurations, updates the locally hosted Web UI, and serves the control panel.
 - `send_server.py`: A deployment utility script. It uses SCP over SSH to quickly deploy updated project files (like `server.py`, `start_visualization.py`, etc.) to all Raspberry Pis.
 - `server.py`: The node application. This heavy script runs on each Raspberry Pi, simulating mining processes, blocks validation, and blockchain synchronization.
@@ -16,7 +17,7 @@ This project is a distributed simulation and visualization tool for blockchain c
 
 ---
 
-## Setup & Deployment
+## 🚀 Setup & Deployment
 
 ### 1. Configure the Network Topology
 Before deploying, define how your Raspberry Pis are interconnected.
@@ -54,8 +55,8 @@ python app.py
 
 ---
 
-## Execution & Mining Process
+## 🎮 Execution & Mining Process
 1. On the launched Web Interface, you can control the entire blockchain environment.
 2. Adjust system parameters like network delays, block throttling mechanisms, and mining difficulty levels.
 3. Click **Start Everything** inside the UI.
-4. Watch the Raspberry Pis visualize the block generation, consensus propagation, and eventual chain harmonization across the topology in real-time.
+4. Watch the Raspberry Pis visualize the block generation, consensus propagation, and eventual chain harmonization across the topology in real-time!
